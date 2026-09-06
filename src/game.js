@@ -16,6 +16,7 @@ const state = {
 
 const SAVE_KEY = 'cake-maker-save';
 const HURRY_SECONDS = 5; // 남은 시간이 이 아래로 내려가면 빨갛게 강조한다
+const WARN_RATIO = 0.4; // 남은 비율이 이 아래로 내려가면 막대가 주황이 된다
 
 // 돈과 해금 목록만 저장한다. 진행 중이던 주문은 새로고침하면 버린다.
 function save() {
@@ -46,6 +47,7 @@ const el = (id) => document.getElementById(id);
 function startOrder() {
   state.order = createOrder(state.unlocked);
   state.bench = [];
+  state.secondsLeft = state.order.seconds;
   render();
   startClock();
 }
@@ -60,6 +62,12 @@ function stopClock() {
 function startClock() {
   stopClock();
   state.secondsLeft = state.order.seconds;
+  // 막대를 가득 찬 상태로 되돌릴 때는 애니메이션을 끈다. 안 그러면 1초 동안 거꾸로 자란다.
+  const fill = el('clockFill');
+  fill.style.transition = 'none';
+  fill.style.width = '100%';
+  void fill.offsetWidth; // ponytail: 리플로우를 강제해 transition 해제를 확정한다
+  fill.style.transition = '';
   renderTopbar();
   state.tick = setInterval(() => {
     state.secondsLeft -= 1;
@@ -76,8 +84,14 @@ function describe(item) {
 function renderTopbar() {
   el('money').textContent = state.money.toLocaleString('ko-KR');
   el('orderNo').textContent = state.orderNo;
-  el('timeLeft').textContent = Math.max(0, state.secondsLeft);
-  el('timer').classList.toggle('hurry', state.secondsLeft <= HURRY_SECONDS);
+  const left = Math.max(0, state.secondsLeft);
+  const total = state.order ? state.order.seconds : 1;
+  const ratio = left / total;
+  el('timeLeft').textContent = left;
+  el('timer').classList.toggle('hurry', left <= HURRY_SECONDS);
+  el('clockFill').style.width = `${ratio * 100}%`;
+  el('clock').classList.toggle('warn', ratio <= WARN_RATIO && left > HURRY_SECONDS);
+  el('clock').classList.toggle('hurry', left <= HURRY_SECONDS);
 }
 
 function renderOrder() {
