@@ -22,3 +22,29 @@ export function scoreIngredients(order, result) {
   }
   return matched / Math.max(order.length, result.length);
 }
+
+// 가장 긴 증가 부분수열의 길이. 입력이 짧아 O(n^2) 로 충분하다.
+function longestIncreasingLength(seq) {
+  const best = seq.map(() => 1);
+  for (let i = 1; i < seq.length; i += 1) {
+    for (let j = 0; j < i; j += 1) {
+      if (seq[j] < seq[i] && best[j] + 1 > best[i]) {
+        best[i] = best[j] + 1;
+      }
+    }
+  }
+  return Math.max(0, ...best);
+}
+
+export function scoreOrder(order, result) {
+  const taken = order.map(() => false);
+  const positions = [];
+  for (const item of result) {
+    const index = order.findIndex((wanted, i) => !taken[i] && wanted.id === item.id);
+    if (index === -1) continue; // 주문에 없는 재료는 재료 축에서 벌한다
+    taken[index] = true;
+    positions.push(index);
+  }
+  if (positions.length <= 1) return 1;
+  return longestIncreasingLength(positions) / positions.length;
+}
