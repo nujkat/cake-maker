@@ -8,6 +8,7 @@ const state = {
   money: 0,
   orderNo: 1,
   unlocked: [...STARTING_UNLOCKED],
+  phase: 'idle', // 'idle' 은 손님을 기다리는 준비 시간, 'making' 은 시계가 도는 제작 시간
   order: null,
   bench: [],
   secondsLeft: 0,
@@ -49,7 +50,19 @@ function load() {
 
 const el = (id) => document.getElementById(id);
 
-function startOrder() {
+// 준비 시간. 시계가 멈춰 있고 선반이 상점 노릇을 한다.
+// 만드는 도중에 재료를 사게 하면 산 시간이 주문 시간에서 빠져 해금이 벌칙이 된다.
+function goIdle() {
+  stopClock();
+  state.phase = 'idle';
+  state.order = null;
+  state.bench = [];
+  state.secondsLeft = 0;
+  render();
+}
+
+function takeOrder() {
+  state.phase = 'making';
   state.order = createOrder(state.unlocked);
   state.bench = [];
   state.secondsLeft = state.order.seconds;
@@ -104,6 +117,11 @@ function renderClock(ratio) {
 }
 
 function renderOrder() {
+  if (!state.order) {
+    el('orderList').innerHTML = '<li class="waiting">손님을 기다리는 중이에요. 지금 재료를 사 두세요.</li>';
+    el('orderPrice').textContent = '0';
+    return;
+  }
   el('orderList').innerHTML = state.order.items
     .map((item) => `<li>${describe(item)}</li>`)
     .join('');
@@ -115,10 +133,14 @@ function renderBench() {
   el('benchList').innerHTML = state.bench
     .map((item, i) => `<li>${describe(item)}<button type="button" data-remove="${i}">✕</button></li>`)
     .join('');
-  el('finishBtn').disabled = state.bench.length === 0;
+  const making = state.phase === 'making';
+  el('finishBtn').textContent = making ? '완성!' : '다음 손님 받기';
+  el('finishBtn').disabled = making && state.bench.length === 0;
 }
 
 function renderShelf() {
+  el('shelfPanel').classList.toggle('shopping', state.phase === 'idle');
+  el('shelfTitle').textContent = state.phase === 'idle' ? '재료 상점' : '재료 선반';
   el('shelfList').innerHTML = INGREDIENTS.map((spec) => {
     const unlocked = state.unlocked.includes(spec.id);
     const right = unlocked ? `${spec.price.toLocaleString('ko-KR')}원` : `🔒 ${spec.unlockCost.toLocaleString('ko-KR')}원`;
@@ -132,7 +154,7 @@ function renderShelf() {
 
 function render() {
   renderTopbar();
-  renderClock(state.order ? state.secondsLeft / state.order.seconds : 1);
+  renderClock(state.order ? state.secondsLeft / state.order.seconds : 0);
   renderOrder();
   renderBench();
   renderShelf();
@@ -213,10 +235,14 @@ el('shelfList').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-id]');
   if (!button) return;
   const id = button.dataset.id;
-  if (state.unlocked.includes(id)) {
-    addIngredient(id);
-    return;
+  const owned = state.unlocked.includes(id);
+
+  if (state.phase === 'making') {
+    if (owned) addIngredient(id);
+    return; // 만드는 중에는 살 수 없다. 시계의 압박을 지키기 위해서다.
   }
+  if (owned) return; // 준비 중에는 담을 작업대가 없다.
+
   const spec = findIngredient(id);
   if (state.money < spec.unlockCost) {
     alert(`${spec.name} 해금에 ${spec.unlockCost.toLocaleString('ko-KR')}원이 필요해요. 지금은 ${state.money.toLocaleString('ko-KR')}원이에요.`);
@@ -248,10 +274,13 @@ async function finish(timedOut) {
   state.orderNo += 1;
   save();
   await showResult(result, timedOut);
-  startOrder();
+  goIdle();
 }
 
-el('finishBtn').addEventListener('click', () => finish(false));
+el('finishBtn').addEventListener('click', () => {
+  if (state.phase === 'making') finish(false);
+  else takeOrder();
+});
 
 load();
-startOrder();
+goIdle();

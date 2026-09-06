@@ -29,6 +29,11 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
 
 #orderList { list-style: none; padding: 0; margin: 0; }
 #orderList li { padding: 8px 0; border-bottom: 1px dashed #eee3d6; }
+#orderList .waiting { color: #9a8c7a; border-bottom: 0; }
+
+/* 준비 시간에는 선반이 상점이라는 걸 눈에 보이게 한다. */
+#shelfPanel.shopping { border-color: #d9773f; box-shadow: 0 0 0 3px rgba(217, 119, 63, .12); }
+#shelfPanel.shopping h2::after { content: ' — 지금 살 수 있어요'; font-weight: 400; color: #d9773f; }
 .price { margin-top: 14px; font-size: 15px; }
 
 .cake { height: 200px; display: flex; align-items: flex-end; justify-content: center; }
