@@ -1,7 +1,7 @@
 // 채점 순수 함수들의 동작을 고정하는 테스트
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { scoreIngredients, scoreOrder, scoreAmounts } from '../src/scoring.js';
+import { scoreIngredients, scoreOrder, scoreAmounts, grade } from '../src/scoring.js';
 
 test('주문과 완전히 같으면 재료 축 만점', () => {
   const order = [{ id: 'choco-sheet' }, { id: 'cherry' }];
@@ -102,4 +102,44 @@ test('계량 재료가 없는 주문은 계량 축이 존재하지 않는다', (
 
 test('계량 재료를 아예 담지 않았으면 계량 축이 존재하지 않는다', () => {
   assert.equal(scoreAmounts([{ id: 'sugar', amount: 100 }], []), null);
+});
+
+test('완벽하면 별 3개와 정가 전액', () => {
+  const order = [{ id: 'sheet' }, { id: 'sugar', amount: 100 }, { id: 'cherry' }];
+  const got = grade(order, order, 600);
+  assert.equal(got.total, 100);
+  assert.equal(got.stars, 3);
+  assert.equal(got.payout, 600);
+  assert.equal(got.weakest, null);
+});
+
+test('계량 재료가 없는 주문도 완벽하면 별 3개', () => {
+  const order = [{ id: 'sheet' }, { id: 'cherry' }];
+  const got = grade(order, order, 600);
+  assert.equal(got.axes.amount, null);
+  assert.equal(got.total, 100);
+  assert.equal(got.stars, 3);
+});
+
+test('전부 틀리면 별 0개와 0원', () => {
+  const order = [{ id: 'sheet' }, { id: 'cherry' }];
+  const result = [{ id: 'mint' }, { id: 'butter' }];
+  const got = grade(order, result, 600);
+  assert.equal(got.stars, 0);
+  assert.equal(got.payout, 0);
+});
+
+test('별 2개는 정가의 3분의 2', () => {
+  // 재료 축만 살짝 깎아 70~89점 구간을 만든다
+  const order = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }, { id: 'e' }];
+  const result = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
+  const got = grade(order, result, 900);
+  assert.equal(got.stars, 2);
+  assert.equal(got.payout, 600);
+});
+
+test('가장 많이 깎인 축을 짚어 준다', () => {
+  const order = [{ id: 'sheet' }, { id: 'sugar', amount: 100 }];
+  const result = [{ id: 'sheet' }, { id: 'sugar', amount: 200 }];
+  assert.equal(grade(order, result, 600).weakest, 'amount');
 });

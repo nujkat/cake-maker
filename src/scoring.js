@@ -71,3 +71,33 @@ export function scoreAmounts(order, result) {
   }
   return counted === 0 ? null : sum / counted;
 }
+
+export function grade(order, result, price) {
+  const axes = {
+    ingredients: scoreIngredients(order, result),
+    order: scoreOrder(order, result),
+    amount: scoreAmounts(order, result),
+  };
+
+  // 존재하지 않는 축의 가중치는 남은 축에 비례 배분한다.
+  // 그러지 않으면 계량 재료 없는 주문은 완벽해도 별 3개가 나오지 않는다.
+  let usedWeight = 0;
+  let weighted = 0;
+  for (const [name, weight] of Object.entries(WEIGHTS)) {
+    if (axes[name] === null) continue;
+    usedWeight += weight;
+    weighted += weight * axes[name];
+  }
+  const total = Math.round((weighted / usedWeight) * 100);
+
+  const [gold, silver, bronze] = STAR_THRESHOLDS;
+  const stars = total >= gold ? 3 : total >= silver ? 2 : total >= bronze ? 1 : 0;
+
+  let weakest = null;
+  for (const name of Object.keys(WEIGHTS)) {
+    if (axes[name] === null || axes[name] === 1) continue;
+    if (weakest === null || axes[name] < axes[weakest]) weakest = name;
+  }
+
+  return { axes, total, stars, payout: Math.round((price * stars) / 3), weakest };
+}
