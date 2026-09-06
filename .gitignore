@@ -1,0 +1,5 @@
+# Windows 에서 셸이 죽을 때 남기는 크래시 덤프
+*.stackdump
+
+# 에이전트 작업 기록 (git 이 정본이다)
+.superpowers/
