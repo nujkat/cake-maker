@@ -12,6 +12,28 @@ const state = {
   bench: [],
 };
 
+const SAVE_KEY = 'cake-maker-save';
+
+// 돈과 해금 목록만 저장한다. 진행 중이던 주문은 새로고침하면 버린다.
+function save() {
+  localStorage.setItem(SAVE_KEY, JSON.stringify({ money: state.money, unlocked: state.unlocked }));
+}
+
+function load() {
+  const raw = localStorage.getItem(SAVE_KEY);
+  if (!raw) return;
+  try {
+    const saved = JSON.parse(raw);
+    state.money = saved.money ?? 0;
+    // 저장된 뒤 카탈로그에서 사라진 재료가 있어도 게임이 깨지지 않게 걸러 낸다
+    state.unlocked = (saved.unlocked ?? STARTING_UNLOCKED).filter((id) =>
+      INGREDIENTS.some((spec) => spec.id === id)
+    );
+  } catch {
+    localStorage.removeItem(SAVE_KEY);
+  }
+}
+
 const el = (id) => document.getElementById(id);
 
 function startOrder() {
@@ -135,8 +157,20 @@ el('shelfList').addEventListener('click', (event) => {
   const button = event.target.closest('button[data-id]');
   if (!button) return;
   const id = button.dataset.id;
-  if (!state.unlocked.includes(id)) return; // 해금은 Task 9 에서 붙인다
-  addIngredient(id);
+  if (state.unlocked.includes(id)) {
+    addIngredient(id);
+    return;
+  }
+  const spec = findIngredient(id);
+  if (state.money < spec.unlockCost) {
+    alert(`${spec.name} 해금에 ${spec.unlockCost}원이 필요해요. 지금은 ${state.money}원이에요.`);
+    return;
+  }
+  if (!confirm(`${spec.name} 을 ${spec.unlockCost}원에 해금할까요?`)) return;
+  state.money -= spec.unlockCost;
+  state.unlocked.push(id);
+  save();
+  render();
 });
 
 el('benchList').addEventListener('click', (event) => {
@@ -150,8 +184,10 @@ el('finishBtn').addEventListener('click', async () => {
   const result = grade(state.order.items, state.bench, state.order.price);
   state.money += result.payout;
   state.orderNo += 1;
+  save();
   await showResult(result);
   startOrder();
 });
 
+load();
 startOrder();
