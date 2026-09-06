@@ -64,6 +64,40 @@ function render() {
   renderShelf();
 }
 
+const AXIS_LABEL = { ingredients: '재료', order: '순서', amount: '계량' };
+const AXIS_COMMENT = {
+  ingredients: '주문한 재료가 아닌데요.',
+  order: '넣는 순서가 뒤바뀌었어요.',
+  amount: '양이 잘 안 맞네요.',
+};
+
+function dots(score) {
+  const filled = Math.round(score * 6);
+  return '●'.repeat(filled) + '○'.repeat(6 - filled);
+}
+
+function showResult(result) {
+  return new Promise((resolve) => {
+    const axes = Object.entries(result.axes)
+      .filter(([, score]) => score !== null)
+      .map(([name, score]) => `<div>${AXIS_LABEL[name]} <b>${dots(score)}</b></div>`)
+      .join('');
+    const comment = result.weakest ? AXIS_COMMENT[result.weakest] : '완벽해요. 딱 주문한 그대로예요.';
+
+    const dialog = el('resultDialog');
+    dialog.innerHTML = `
+      <form method="dialog">
+        <p class="stars">${'⭐'.repeat(result.stars)}${'☆'.repeat(3 - result.stars)}</p>
+        <div class="axes">${axes}</div>
+        <p class="comment">"${comment}"</p>
+        <p class="payout"><b>${result.payout.toLocaleString('ko-KR')}</b>원 획득</p>
+        <menu><button value="next" type="submit">다음 손님</button></menu>
+      </form>`;
+    dialog.onclose = () => resolve();
+    dialog.showModal();
+  });
+}
+
 // 계량 재료를 담기 전에 슬라이더로 수치를 받는다.
 // 주문서의 정답 수치는 절대 보여주지 않는다. 그것을 맞추는 것이 게임이다.
 function askAmount(spec) {
@@ -112,11 +146,12 @@ el('benchList').addEventListener('click', (event) => {
   renderBench();
 });
 
-el('finishBtn').addEventListener('click', () => {
+el('finishBtn').addEventListener('click', async () => {
   const result = grade(state.order.items, state.bench, state.order.price);
   state.money += result.payout;
   state.orderNo += 1;
-  startOrder(); // 결과 화면은 Task 8 에서 이 사이에 끼운다
+  await showResult(result);
+  startOrder();
 });
 
 startOrder();
