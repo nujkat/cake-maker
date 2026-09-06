@@ -24,11 +24,15 @@ function load() {
   if (!raw) return;
   try {
     const saved = JSON.parse(raw);
-    state.money = saved.money ?? 0;
+    const money = saved.money ?? 0;
     // 저장된 뒤 카탈로그에서 사라진 재료가 있어도 게임이 깨지지 않게 걸러 낸다
-    state.unlocked = (saved.unlocked ?? STARTING_UNLOCKED).filter((id) =>
+    const kept = (saved.unlocked ?? STARTING_UNLOCKED).filter((id) =>
       INGREDIENTS.some((spec) => spec.id === id)
     );
+    // 걸러 내고 남은 게 없으면(전부 사라졌거나 저장이 아예 비었으면) 시작 재료로 되돌린다
+    const unlocked = kept.length > 0 ? kept : [...STARTING_UNLOCKED];
+    state.money = money;
+    state.unlocked = unlocked;
   } catch {
     localStorage.removeItem(SAVE_KEY);
   }
