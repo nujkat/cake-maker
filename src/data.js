@@ -6,13 +6,13 @@ export const INGREDIENTS = [
   { id: 'sugar', name: '설탕', type: 'filling', color: '#fdfdfd', measured: true, unit: 'g', range: [40, 200], step: 5, price: 50, unlockCost: 0 },
   { id: 'cherry', name: '체리', type: 'topping', color: '#c0223b', measured: false, price: 80, unlockCost: 0 },
 
-  { id: 'blueberry', name: '블루베리', type: 'topping', color: '#4a4b9c', measured: false, price: 90, unlockCost: 250 },
-  { id: 'matcha-cream', name: '말차 크림', type: 'filling', color: '#8bbf62', measured: false, price: 180, unlockCost: 300 },
-  { id: 'mint', name: '민트 잎', type: 'topping', color: '#3fa36b', measured: false, price: 70, unlockCost: 350 },
-  { id: 'choco-cream', name: '초코 크림', type: 'filling', color: '#6b4423', measured: false, price: 190, unlockCost: 400 },
-  { id: 'butter', name: '버터', type: 'filling', color: '#f5d76e', measured: true, unit: 'g', range: [20, 120], step: 5, price: 120, unlockCost: 500 },
-  { id: 'red-velvet-sheet', name: '레드벨벳 시트', type: 'sheet', color: '#a32638', measured: false, price: 260, unlockCost: 600 },
-  { id: 'gold-leaf', name: '금박', type: 'topping', color: '#e6c34a', measured: false, price: 300, unlockCost: 900 },
+  { id: 'blueberry', name: '블루베리', type: 'topping', color: '#4a4b9c', measured: false, price: 90, unlockCost: 2500 },
+  { id: 'matcha-cream', name: '말차 크림', type: 'filling', color: '#8bbf62', measured: false, price: 180, unlockCost: 3000 },
+  { id: 'mint', name: '민트 잎', type: 'topping', color: '#3fa36b', measured: false, price: 70, unlockCost: 3500 },
+  { id: 'choco-cream', name: '초코 크림', type: 'filling', color: '#6b4423', measured: false, price: 190, unlockCost: 4000 },
+  { id: 'butter', name: '버터', type: 'filling', color: '#f5d76e', measured: true, unit: 'g', range: [20, 120], step: 5, price: 120, unlockCost: 5000 },
+  { id: 'red-velvet-sheet', name: '레드벨벳 시트', type: 'sheet', color: '#a32638', measured: false, price: 260, unlockCost: 6000 },
+  { id: 'gold-leaf', name: '금박', type: 'topping', color: '#e6c34a', measured: false, price: 300, unlockCost: 9000 },
 ];
 
 export const STARTING_UNLOCKED = INGREDIENTS.filter((it) => it.unlockCost === 0).map((it) => it.id);
