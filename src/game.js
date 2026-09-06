@@ -80,6 +80,7 @@ function askAmount(spec) {
     el('amountValue').textContent = range.value;
     range.oninput = () => { el('amountValue').textContent = range.value; };
     dialog.onclose = () => resolve(dialog.returnValue === 'ok' ? Number(range.value) : null);
+    dialog.returnValue = ''; // 재사용되는 다이얼로그라 이전 호출의 'ok' 가 남아있을 수 있다
     dialog.showModal();
   });
 }
