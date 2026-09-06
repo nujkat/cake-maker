@@ -1,0 +1,47 @@
+/* 3단 레이아웃과 재료 버튼의 겉모습 */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color: #33291f; }
+
+.topbar { display: flex; justify-content: space-between; align-items: center;
+  padding: 12px 20px; background: #fff; border-bottom: 1px solid #e6ded3; }
+.topbar h1 { font-size: 20px; margin: 0; }
+.stats { display: flex; gap: 20px; font-size: 15px; }
+
+.board { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 16px; padding: 16px;
+  align-items: start; max-width: 1100px; margin: 0 auto; }
+.panel { background: #fff; border: 1px solid #e6ded3; border-radius: 10px; padding: 16px; }
+.panel h2 { margin: 0 0 12px; font-size: 16px; }
+.panel h3 { margin: 16px 0 8px; font-size: 14px; color: #7a6a58; }
+
+#orderList { list-style: none; padding: 0; margin: 0; }
+#orderList li { padding: 8px 0; border-bottom: 1px dashed #eee3d6; }
+.price { margin-top: 14px; font-size: 15px; }
+
+.cake { height: 200px; display: flex; align-items: flex-end; justify-content: center; }
+.bench { margin: 0; padding-left: 20px; min-height: 60px; }
+.bench li { padding: 4px 0; }
+.bench button { margin-left: 8px; border: 0; background: none; cursor: pointer; color: #b04a4a; }
+
+#finishBtn { width: 100%; margin-top: 16px; padding: 12px; font-size: 16px; cursor: pointer;
+  border: 0; border-radius: 8px; background: #d9773f; color: #fff; }
+#finishBtn:disabled { background: #d8cfc4; cursor: not-allowed; }
+
+.shelf { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.shelf button { width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 12px; cursor: pointer; border: 1px solid #e6ded3; border-radius: 8px; background: #fffdfa; }
+.shelf button:hover { border-color: #d9773f; }
+.shelf .locked button { color: #a2968a; background: #f4efe8; }
+.swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,.15); }
+.shelf .label { display: flex; align-items: center; gap: 8px; }
+
+dialog { border: 0; border-radius: 12px; padding: 20px; min-width: 280px; }
+dialog::backdrop { background: rgba(0,0,0,.35); }
+dialog menu { display: flex; justify-content: flex-end; gap: 8px; padding: 0; margin: 16px 0 0; }
+dialog button { padding: 8px 16px; cursor: pointer; border-radius: 6px; border: 1px solid #ddd2c4; background: #fff; }
+#amountRange { width: 100%; }
+.amountValue { text-align: center; font-size: 22px; margin: 8px 0 0; }
+
+.stars { font-size: 34px; text-align: center; margin: 0 0 12px; }
+.axes { display: grid; gap: 6px; margin: 0 0 14px; font-size: 14px; }
+.comment { text-align: center; color: #7a6a58; margin: 0 0 14px; }
+.payout { text-align: center; font-size: 18px; margin: 0; }

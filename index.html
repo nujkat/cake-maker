@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>케익 만들기</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>🍰 케익 가게</h1>
+    <div class="stats">
+      <span>💰 <b id="money">0</b>원</span>
+      <span>주문 <b id="orderNo">1</b>번째</span>
+    </div>
+  </header>
+
+  <main class="board">
+    <section class="panel" id="orderPanel">
+      <h2>주문서</h2>
+      <ul id="orderList"></ul>
+      <p class="price">정가 <b id="orderPrice">0</b>원</p>
+    </section>
+
+    <section class="panel" id="benchPanel">
+      <h2>작업대</h2>
+      <div class="cake" id="cake"></div>
+      <h3>넣은 것</h3>
+      <ol id="benchList" class="bench"></ol>
+      <button id="finishBtn" type="button">완성!</button>
+    </section>
+
+    <section class="panel" id="shelfPanel">
+      <h2>재료 선반</h2>
+      <ul id="shelfList" class="shelf"></ul>
+    </section>
+  </main>
+
+  <dialog id="amountDialog">
+    <form method="dialog">
+      <h3 id="amountTitle">설탕</h3>
+      <input type="range" id="amountRange">
+      <p class="amountValue"><b id="amountValue">0</b><span id="amountUnit">g</span></p>
+      <menu>
+        <button value="cancel" type="submit">취소</button>
+        <button value="ok" type="submit">담기</button>
+      </menu>
+    </form>
+  </dialog>
+
+  <dialog id="resultDialog"></dialog>
+
+  <script type="module" src="src/game.js"></script>
+</body>
+</html>
