@@ -48,3 +48,26 @@ export function scoreOrder(order, result) {
   if (positions.length <= 1) return 1;
   return longestIncreasingLength(positions) / positions.length;
 }
+
+function errorToScore(errorRatio) {
+  if (errorRatio <= AMOUNT_TOLERANCE) return 1;
+  if (errorRatio >= AMOUNT_LIMIT) return 0;
+  return (AMOUNT_LIMIT - errorRatio) / (AMOUNT_LIMIT - AMOUNT_TOLERANCE);
+}
+
+export function scoreAmounts(order, result) {
+  const taken = result.map(() => false);
+  let sum = 0;
+  let counted = 0;
+  for (const wanted of order) {
+    if (typeof wanted.amount !== 'number') continue;
+    const index = result.findIndex(
+      (made, i) => !taken[i] && made.id === wanted.id && typeof made.amount === 'number'
+    );
+    if (index === -1) continue; // 안 담은 것은 재료 축에서 벌한다
+    taken[index] = true;
+    sum += errorToScore(Math.abs(result[index].amount - wanted.amount) / wanted.amount);
+    counted += 1;
+  }
+  return counted === 0 ? null : sum / counted;
+}

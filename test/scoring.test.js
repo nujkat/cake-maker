@@ -1,7 +1,7 @@
 // 채점 순수 함수들의 동작을 고정하는 테스트
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { scoreIngredients, scoreOrder } from '../src/scoring.js';
+import { scoreIngredients, scoreOrder, scoreAmounts } from '../src/scoring.js';
 
 test('주문과 완전히 같으면 재료 축 만점', () => {
   const order = [{ id: 'choco-sheet' }, { id: 'cherry' }];
@@ -68,4 +68,38 @@ test('빠뜨린 재료 때문에 순서가 이중으로 깎이지 않는다', ()
 
 test('담은 게 하나뿐이면 순서를 따질 수 없으므로 만점', () => {
   assert.equal(scoreOrder([{ id: 'a' }, { id: 'b' }], [{ id: 'a' }]), 1);
+});
+
+test('수치가 정확하면 계량 축 만점', () => {
+  const order = [{ id: 'sugar', amount: 120 }];
+  assert.equal(scoreAmounts(order, [{ id: 'sugar', amount: 120 }]), 1);
+});
+
+test('오차 10퍼센트까지는 만점', () => {
+  const order = [{ id: 'sugar', amount: 100 }];
+  assert.equal(scoreAmounts(order, [{ id: 'sugar', amount: 110 }]), 1);
+});
+
+test('오차 50퍼센트를 넘으면 0점', () => {
+  const order = [{ id: 'sugar', amount: 100 }];
+  assert.equal(scoreAmounts(order, [{ id: 'sugar', amount: 160 }]), 0);
+});
+
+test('오차 30퍼센트는 중간 점수', () => {
+  const order = [{ id: 'sugar', amount: 100 }];
+  assert.equal(scoreAmounts(order, [{ id: 'sugar', amount: 130 }]), 0.5);
+});
+
+test('계량 재료가 여럿이면 평균을 낸다', () => {
+  const order = [{ id: 'sugar', amount: 100 }, { id: 'butter', amount: 100 }];
+  const result = [{ id: 'sugar', amount: 100 }, { id: 'butter', amount: 160 }];
+  assert.equal(scoreAmounts(order, result), 0.5);
+});
+
+test('계량 재료가 없는 주문은 계량 축이 존재하지 않는다', () => {
+  assert.equal(scoreAmounts([{ id: 'cherry' }], [{ id: 'cherry' }]), null);
+});
+
+test('계량 재료를 아예 담지 않았으면 계량 축이 존재하지 않는다', () => {
+  assert.equal(scoreAmounts([{ id: 'sugar', amount: 100 }], []), null);
 });
