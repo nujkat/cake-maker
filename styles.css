@@ -6,6 +6,8 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
   padding: 12px 20px; background: #fff; border-bottom: 1px solid #e6ded3; }
 .topbar h1 { font-size: 20px; margin: 0; }
 .stats { display: flex; gap: 20px; font-size: 15px; }
+#timer { font-variant-numeric: tabular-nums; }
+#timer.hurry { color: #c22; font-weight: 700; }
 
 .board { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 16px; padding: 16px;
   align-items: start; max-width: 1100px; margin: 0 auto; }

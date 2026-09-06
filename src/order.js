@@ -3,6 +3,20 @@ import { INGREDIENTS, findIngredient } from './data.js';
 
 const PRICE_MARKUP = 2.2; // 재료 원가 대비 손님이 내는 값
 
+// 제한 시간. 주문서를 읽는 시간에 재료마다 담는 시간을 더한다.
+// 계량 재료는 슬라이더를 맞춰야 해서 클릭보다 오래 걸린다.
+// 플레이해 보고 감으로 맞추는 값이다.
+const READ_SECONDS = 6;
+const PLAIN_SECONDS = 2;
+const MEASURED_SECONDS = 5;
+
+export function orderSeconds(items) {
+  return items.reduce(
+    (total, item) => total + (typeof item.amount === 'number' ? MEASURED_SECONDS : PLAIN_SECONDS),
+    READ_SECONDS
+  );
+}
+
 function pickOne(pool, rng) {
   return pool[Math.floor(rng() * pool.length)];
 }
@@ -47,5 +61,5 @@ export function createOrder(unlockedIds, rng = Math.random) {
 
   const cost = items.reduce((sum, it) => sum + findIngredient(it.id).price, 0);
   const price = Math.round((cost * PRICE_MARKUP) / 10) * 10;
-  return { items, price };
+  return { items, price, seconds: orderSeconds(items) };
 }

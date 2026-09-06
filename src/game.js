@@ -10,9 +10,12 @@ const state = {
   unlocked: [...STARTING_UNLOCKED],
   order: null,
   bench: [],
+  secondsLeft: 0,
+  tick: null,
 };
 
 const SAVE_KEY = 'cake-maker-save';
+const HURRY_SECONDS = 5; // 남은 시간이 이 아래로 내려가면 빨갛게 강조한다
 
 // 돈과 해금 목록만 저장한다. 진행 중이던 주문은 새로고침하면 버린다.
 function save() {
@@ -44,6 +47,25 @@ function startOrder() {
   state.order = createOrder(state.unlocked);
   state.bench = [];
   render();
+  startClock();
+}
+
+function stopClock() {
+  clearInterval(state.tick);
+  state.tick = null;
+}
+
+// 시계는 계량 슬라이더가 열려 있는 동안에도 계속 간다.
+// 멈추면 슬라이더를 연 채로 무한정 생각할 수 있어 압박이 사라진다.
+function startClock() {
+  stopClock();
+  state.secondsLeft = state.order.seconds;
+  renderTopbar();
+  state.tick = setInterval(() => {
+    state.secondsLeft -= 1;
+    renderTopbar();
+    if (state.secondsLeft <= 0) finish(true);
+  }, 1000);
 }
 
 function describe(item) {
@@ -54,6 +76,8 @@ function describe(item) {
 function renderTopbar() {
   el('money').textContent = state.money.toLocaleString('ko-KR');
   el('orderNo').textContent = state.orderNo;
+  el('timeLeft').textContent = Math.max(0, state.secondsLeft);
+  el('timer').classList.toggle('hurry', state.secondsLeft <= HURRY_SECONDS);
 }
 
 function renderOrder() {
@@ -102,13 +126,17 @@ function dots(score) {
   return '●'.repeat(filled) + '○'.repeat(6 - filled);
 }
 
-function showResult(result) {
+function showResult(result, timedOut) {
   return new Promise((resolve) => {
     const axes = Object.entries(result.axes)
       .filter(([, score]) => score !== null)
       .map(([name, score]) => `<div>${AXIS_LABEL[name]} <b>${dots(score)}</b></div>`)
       .join('');
-    const comment = result.weakest ? AXIS_COMMENT[result.weakest] : '완벽해요. 딱 주문한 그대로예요.';
+    const comment = timedOut
+      ? '시간이 다 됐어요.'
+      : result.weakest
+        ? AXIS_COMMENT[result.weakest]
+        : '완벽해요. 딱 주문한 그대로예요.';
 
     const dialog = el('resultDialog');
     dialog.innerHTML = `
@@ -184,14 +212,22 @@ el('benchList').addEventListener('click', (event) => {
   renderBench();
 });
 
-el('finishBtn').addEventListener('click', async () => {
+// 완성 버튼과 시간 종료가 같은 경로를 쓴다. 시간이 끝나도 담긴 그대로 채점될 뿐이다.
+async function finish(timedOut) {
+  stopClock();
+  // 계량 슬라이더가 열린 채 시간이 끝나면 먼저 닫는다. 그 재료는 담기지 않는다.
+  const amountDialog = el('amountDialog');
+  if (amountDialog.open) amountDialog.close();
+
   const result = grade(state.order.items, state.bench, state.order.price);
   state.money += result.payout;
   state.orderNo += 1;
   save();
-  await showResult(result);
+  await showResult(result, timedOut);
   startOrder();
-});
+}
+
+el('finishBtn').addEventListener('click', () => finish(false));
 
 load();
 startOrder();

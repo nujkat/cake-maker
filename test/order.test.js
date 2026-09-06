@@ -1,7 +1,7 @@
 // 주문 생성이 해금 범위와 난이도 규칙을 지키는지 확인하는 테스트
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { createOrder } from '../src/order.js';
+import { createOrder, orderSeconds } from '../src/order.js';
 import { STARTING_UNLOCKED, findIngredient } from '../src/data.js';
 
 // 정해진 값을 돌아가며 내놓는 고정 난수
@@ -61,4 +61,32 @@ test('해금이 늘면 주문이 길어질 수 있다', () => {
   const before = longest(STARTING_UNLOCKED);
   const after = longest(all);
   assert.ok(after > before, `해금 전 최대 ${before}, 해금 후 최대 ${after}`);
+});
+
+test('빈 주문에도 최소 시간은 남는다', () => {
+  assert.ok(orderSeconds([]) > 0);
+});
+
+test('재료가 늘면 제한 시간이 늘어난다', () => {
+  const one = orderSeconds([{ id: 'cherry' }]);
+  const two = orderSeconds([{ id: 'cherry' }, { id: 'cherry' }]);
+  assert.ok(two > one);
+});
+
+test('계량 재료는 일반 재료보다 시간을 더 받는다', () => {
+  const plain = orderSeconds([{ id: 'cherry' }]);
+  const measured = orderSeconds([{ id: 'sugar', amount: 100 }]);
+  assert.ok(measured > plain, `계량 ${measured}초, 일반 ${plain}초`);
+});
+
+test('제한 시간은 정수 초다', () => {
+  assert.equal(orderSeconds([{ id: 'sugar', amount: 100 }, { id: 'cherry' }]) % 1, 0);
+});
+
+test('주문에 제한 시간이 붙어 있다', () => {
+  for (let i = 0; i < 200; i += 1) {
+    const order = createOrder(STARTING_UNLOCKED);
+    assert.equal(order.seconds, orderSeconds(order.items));
+    assert.ok(order.seconds >= 10, `${order.items.length}개 주문에 ${order.seconds}초는 너무 짧다`);
+  }
 });
