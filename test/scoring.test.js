@@ -66,8 +66,8 @@ test('빠뜨린 재료 때문에 순서가 이중으로 깎이지 않는다', ()
   assert.equal(scoreOrder(order, result), 1);
 });
 
-test('담은 게 하나뿐이면 순서를 따질 수 없으므로 만점', () => {
-  assert.equal(scoreOrder([{ id: 'a' }, { id: 'b' }], [{ id: 'a' }]), 1);
+test('담은 게 하나뿐이면 순서 축이 존재하지 않는다', () => {
+  assert.equal(scoreOrder([{ id: 'a' }, { id: 'b' }], [{ id: 'a' }]), null);
 });
 
 test('수치가 정확하면 계량 축 만점', () => {
@@ -127,6 +127,7 @@ test('전부 틀리면 별 0개와 0원', () => {
   const got = grade(order, result, 600);
   assert.equal(got.stars, 0);
   assert.equal(got.payout, 0);
+  assert.equal(got.total, 0);
 });
 
 test('별 2개는 정가의 3분의 2', () => {

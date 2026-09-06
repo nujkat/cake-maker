@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- 케익 만들기 게임의 화면 골격 -->
 <html lang="ko">
 <head>
   <meta charset="utf-8">
@@ -39,11 +40,11 @@
   <dialog id="amountDialog">
     <form method="dialog">
       <h3 id="amountTitle">설탕</h3>
-      <input type="range" id="amountRange">
+      <input type="range" id="amountRange" aria-labelledby="amountTitle">
       <p class="amountValue"><b id="amountValue">0</b><span id="amountUnit">g</span></p>
       <menu>
-        <button value="cancel" type="submit">취소</button>
         <button value="ok" type="submit">담기</button>
+        <button value="cancel" type="submit">취소</button>
       </menu>
     </form>
   </dialog>

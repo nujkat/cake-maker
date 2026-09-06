@@ -22,7 +22,7 @@ export function renderCake(items) {
       continue;
     }
     const height = spec.type === 'sheet' ? SHEET_HEIGHT : FILLING_HEIGHT;
-    y -= height;
+    y = Math.max(y - height, 4);
     const width = spec.type === 'sheet' ? 140 : 132;
     const x = (WIDTH - width) / 2;
     parts.push(
@@ -35,7 +35,7 @@ export function renderCake(items) {
     const perRow = Math.min(toppings.length, 5);
     const step = 108 / (perRow + 1);
     const cx = 46 + step * ((i % perRow) + 1);
-    const cy = y - 9 - Math.floor(i / perRow) * 15;
+    const cy = Math.max(y - 9 - Math.floor(i / perRow) * 15, 4);
     parts.push(`<circle cx="${cx}" cy="${cy}" r="7" fill="${spec.color}" stroke="rgba(0,0,0,.15)" />`);
   });
 

@@ -45,7 +45,7 @@ export function scoreOrder(order, result) {
     taken[index] = true;
     positions.push(index);
   }
-  if (positions.length <= 1) return 1;
+  if (positions.length <= 1) return null;
   return longestIncreasingLength(positions) / positions.length;
 }
 

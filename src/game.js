@@ -24,14 +24,14 @@ function load() {
   if (!raw) return;
   try {
     const saved = JSON.parse(raw);
-    const money = saved.money ?? 0;
     // 저장된 뒤 카탈로그에서 사라진 재료가 있어도 게임이 깨지지 않게 걸러 낸다
     const kept = (saved.unlocked ?? STARTING_UNLOCKED).filter((id) =>
       INGREDIENTS.some((spec) => spec.id === id)
     );
-    // 걸러 내고 남은 게 없으면(전부 사라졌거나 저장이 아예 비었으면) 시작 재료로 되돌린다
-    const unlocked = kept.length > 0 ? kept : [...STARTING_UNLOCKED];
-    state.money = money;
+    // 시작 재료는 무료이므로 항상 있어야 한다. 저장분과 합쳐 createOrder 가 요구하는
+    // "최소 한 장의 시트" 불변조건을 보장한다.
+    const unlocked = [...new Set([...STARTING_UNLOCKED, ...kept])];
+    state.money = Number(saved.money) || 0;
     state.unlocked = unlocked;
   } catch {
     localStorage.removeItem(SAVE_KEY);
@@ -74,7 +74,7 @@ function renderBench() {
 function renderShelf() {
   el('shelfList').innerHTML = INGREDIENTS.map((spec) => {
     const unlocked = state.unlocked.includes(spec.id);
-    const right = unlocked ? `${spec.price}원` : `🔒 ${spec.unlockCost}원`;
+    const right = unlocked ? `${spec.price.toLocaleString('ko-KR')}원` : `🔒 ${spec.unlockCost.toLocaleString('ko-KR')}원`;
     return `<li class="${unlocked ? '' : 'locked'}">
       <button type="button" data-id="${spec.id}">
         <span class="label"><span class="swatch" style="background:${spec.color}"></span>${spec.name}</span>
@@ -167,10 +167,10 @@ el('shelfList').addEventListener('click', (event) => {
   }
   const spec = findIngredient(id);
   if (state.money < spec.unlockCost) {
-    alert(`${spec.name} 해금에 ${spec.unlockCost}원이 필요해요. 지금은 ${state.money}원이에요.`);
+    alert(`${spec.name} 해금에 ${spec.unlockCost.toLocaleString('ko-KR')}원이 필요해요. 지금은 ${state.money.toLocaleString('ko-KR')}원이에요.`);
     return;
   }
-  if (!confirm(`${spec.name} 을 ${spec.unlockCost}원에 해금할까요?`)) return;
+  if (!confirm(`${spec.name} 을 ${spec.unlockCost.toLocaleString('ko-KR')}원에 해금할까요?`)) return;
   state.money -= spec.unlockCost;
   state.unlocked.push(id);
   save();
