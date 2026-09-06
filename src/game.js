@@ -11,8 +11,13 @@ const state = {
   order: null,
   bench: [],
   secondsLeft: 0,
+  deadline: 0,
   tick: null,
 };
+
+// 브라우저에서는 매 프레임, Node 테스트에서는 대략 60fps 로 흉내 낸다.
+const nextFrame = globalThis.requestAnimationFrame ?? ((fn) => setTimeout(fn, 16));
+const cancelFrame = globalThis.cancelAnimationFrame ?? clearTimeout;
 
 const SAVE_KEY = 'cake-maker-save';
 const HURRY_SECONDS = 5; // 남은 시간이 이 아래로 내려가면 빨갛게 강조한다
@@ -53,7 +58,7 @@ function startOrder() {
 }
 
 function stopClock() {
-  clearInterval(state.tick);
+  cancelFrame(state.tick);
   state.tick = null;
 }
 
@@ -61,19 +66,22 @@ function stopClock() {
 // 멈추면 슬라이더를 연 채로 무한정 생각할 수 있어 압박이 사라진다.
 function startClock() {
   stopClock();
-  state.secondsLeft = state.order.seconds;
-  // 막대를 가득 찬 상태로 되돌릴 때는 애니메이션을 끈다. 안 그러면 1초 동안 거꾸로 자란다.
-  const fill = el('clockFill');
-  fill.style.transition = 'none';
-  fill.style.width = '100%';
-  void fill.offsetWidth; // ponytail: 리플로우를 강제해 transition 해제를 확정한다
-  fill.style.transition = '';
-  renderTopbar();
-  state.tick = setInterval(() => {
-    state.secondsLeft -= 1;
-    renderTopbar();
-    if (state.secondsLeft <= 0) finish(true);
-  }, 1000);
+  state.deadline = performance.now() + state.order.seconds * 1000;
+  tickClock();
+}
+
+// 막대와 숫자를 모두 실제 경과 시간에서 그린다.
+// 틱 횟수로 그리면 setInterval 이 밀린 만큼 벽시계와 어긋나고,
+// CSS transition 으로 그리면 막대가 목표 폭까지 기어가느라 늘 한 박자 늦는다.
+function tickClock() {
+  const msLeft = state.deadline - performance.now();
+  state.secondsLeft = Math.max(0, Math.ceil(msLeft / 1000));
+  renderClock(Math.max(0, msLeft) / (state.order.seconds * 1000));
+  if (msLeft <= 0) {
+    finish(true);
+    return;
+  }
+  state.tick = nextFrame(tickClock);
 }
 
 function describe(item) {
@@ -84,9 +92,10 @@ function describe(item) {
 function renderTopbar() {
   el('money').textContent = state.money.toLocaleString('ko-KR');
   el('orderNo').textContent = state.orderNo;
-  const left = Math.max(0, state.secondsLeft);
-  const total = state.order ? state.order.seconds : 1;
-  const ratio = left / total;
+}
+
+function renderClock(ratio) {
+  const left = state.secondsLeft;
   el('timeLeft').textContent = left;
   el('timer').classList.toggle('hurry', left <= HURRY_SECONDS);
   el('clockFill').style.width = `${ratio * 100}%`;
@@ -123,6 +132,7 @@ function renderShelf() {
 
 function render() {
   renderTopbar();
+  renderClock(state.order ? state.secondsLeft / state.order.seconds : 1);
   renderOrder();
   renderBench();
   renderShelf();

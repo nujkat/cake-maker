@@ -11,8 +11,9 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
 
 /* 남은 시간 막대. 폭이 줄어드는 것만으로 압박을 준다. */
 .clock { height: 10px; background: #ece4d9; overflow: hidden; }
-.clockFill { height: 100%; width: 100%; background: #6fae5a; transform-origin: left center;
-  transition: width 1s linear, background-color .4s linear; }
+/* 폭은 매 프레임 직접 그린다. transition 을 걸면 막대가 늘 한 박자 늦는다. */
+.clockFill { height: 100%; width: 100%; background: #6fae5a;
+  transition: background-color .4s linear; }
 .clock.warn .clockFill { background: #e0a33e; }
 .clock.hurry .clockFill { background: #d0433f; animation: throb .6s ease-in-out infinite; }
 @keyframes throb { 50% { opacity: .4; } }
