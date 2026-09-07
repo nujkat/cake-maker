@@ -12,6 +12,8 @@ button { touch-action: manipulation; }
 .stats { display: flex; gap: 20px; font-size: 15px; }
 #timer { font-variant-numeric: tabular-nums; }
 #timer.hurry { color: #c22; font-weight: 700; }
+#resetBtn { min-width: 40px; min-height: 40px; margin: -10px 0; padding: 0; font-size: 18px;
+  border: 0; background: none; cursor: pointer; color: #a2968a; }
 
 /* 남은 시간 막대. 폭이 줄어드는 것만으로 압박을 준다. */
 .clock { position: sticky; top: 45px; z-index: 2; height: 10px; background: #ece4d9; overflow: hidden; }
