@@ -2,7 +2,11 @@
 * { box-sizing: border-box; }
 body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color: #33291f; }
 
-.topbar { display: flex; justify-content: space-between; align-items: center;
+/* 터치에서 더블탭 확대 대기(약 300ms)를 없앤다. 재료를 연속으로 두드릴 때 체감이 크다. */
+button { touch-action: manipulation; }
+
+/* 세로 화면에서는 패널을 위아래로 쌓느라 시계가 스크롤 밖으로 나간다. 위에 붙여 둔다. */
+.topbar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center;
   padding: 12px 20px; background: #fff; border-bottom: 1px solid #e6ded3; }
 .topbar h1 { font-size: 20px; margin: 0; }
 .stats { display: flex; gap: 20px; font-size: 15px; }
@@ -10,7 +14,7 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
 #timer.hurry { color: #c22; font-weight: 700; }
 
 /* 남은 시간 막대. 폭이 줄어드는 것만으로 압박을 준다. */
-.clock { height: 10px; background: #ece4d9; overflow: hidden; }
+.clock { position: sticky; top: 45px; z-index: 2; height: 10px; background: #ece4d9; overflow: hidden; }
 /* 폭은 매 프레임 직접 그린다. transition 을 걸면 막대가 늘 한 박자 늦는다. */
 .clockFill { height: 100%; width: 100%; background: #6fae5a;
   transition: background-color .4s linear; }
@@ -39,7 +43,9 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
 .cake { height: 200px; display: flex; align-items: flex-end; justify-content: center; }
 .bench { margin: 0; padding-left: 20px; min-height: 60px; }
 .bench li { padding: 4px 0; }
-.bench button { margin-left: 8px; border: 0; background: none; cursor: pointer; color: #b04a4a; }
+/* 손가락으로 누를 수 있는 최소 크기(48px)까지 키운다. 글자만큼 작으면 옆 항목을 지운다. */
+.bench button { min-width: 48px; min-height: 48px; margin-left: 4px; border: 0; background: none;
+  cursor: pointer; color: #b04a4a; font-size: 16px; }
 
 #finishBtn { width: 100%; margin-top: 16px; padding: 12px; font-size: 16px; cursor: pointer;
   border: 0; border-radius: 8px; background: #d9773f; color: #fff; }
@@ -47,8 +53,8 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
 
 .shelf { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 .shelf button { width: 100%; display: flex; justify-content: space-between; align-items: center;
-  padding: 10px 12px; cursor: pointer; border: 1px solid #e6ded3; border-radius: 8px; background: #fffdfa; }
-.shelf button:hover { border-color: #d9773f; }
+  min-height: 48px; padding: 10px 12px; cursor: pointer; border: 1px solid #e6ded3; border-radius: 8px; background: #fffdfa; }
+@media (hover: hover) { .shelf button:hover { border-color: #d9773f; } }
 .shelf .locked button { color: #a2968a; background: #f4efe8; }
 .swatch { width: 14px; height: 14px; border-radius: 4px; border: 1px solid rgba(0,0,0,.15); }
 .shelf .label { display: flex; align-items: center; gap: 8px; }
@@ -58,7 +64,10 @@ dialog::backdrop { background: rgba(0,0,0,.35); }
 dialog menu { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 8px; padding: 0; margin: 16px 0 0; }
 dialog button { padding: 8px 16px; cursor: pointer; border-radius: 6px; border: 1px solid #ddd2c4; background: #fff; }
 #amountRange { width: 100%; }
-.amountValue { text-align: center; font-size: 22px; margin: 8px 0 0; }
+.amountValue { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  text-align: center; font-size: 22px; margin: 8px 0 0; }
+.amountValue button { width: 56px; height: 56px; font-size: 26px; line-height: 1; }
+#amountRange { height: 44px; } /* 슬라이더 손잡이를 손가락으로 잡을 수 있는 높이 */
 
 .stars { font-size: 34px; text-align: center; margin: 0 0 12px; }
 .axes { display: grid; gap: 6px; margin: 0 0 14px; font-size: 14px; }

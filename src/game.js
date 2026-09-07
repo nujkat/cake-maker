@@ -213,6 +213,13 @@ function askAmount(spec) {
     el('amountUnit').textContent = spec.unit;
     el('amountValue').textContent = range.value;
     range.oninput = () => { el('amountValue').textContent = range.value; };
+    // 슬라이더만으로는 손가락으로 한 칸을 맞출 수 없다. 계단 버튼이 유일한 정밀 조작이다.
+    const nudge = (delta) => () => {
+      range.value = Number(range.value) + delta * Number(spec.step);
+      range.oninput();
+    };
+    el('amountDown').onclick = nudge(-1);
+    el('amountUp').onclick = nudge(1);
     dialog.onclose = () => resolve(dialog.returnValue === 'ok' ? Number(range.value) : null);
     dialog.returnValue = ''; // 재사용되는 다이얼로그라 이전 호출의 'ok' 가 남아있을 수 있다
     dialog.showModal();
