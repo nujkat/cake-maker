@@ -5,20 +5,22 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>케익 만들기</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=2">
 </head>
 <body>
-  <header class="topbar">
-    <h1>🍰 케익 가게</h1>
-    <div class="stats">
-      <span>💰 <b id="money">0</b>원</span>
-      <span>주문 <b id="orderNo">1</b>번째</span>
-      <span id="timer">⏱ <b id="timeLeft">0</b>초</span>
-      <button id="resetBtn" type="button" title="진행 상황 초기화">↺</button>
-    </div>
-  </header>
-
-  <div class="clock" id="clock"><div class="clockFill" id="clockFill"></div></div>
+  <!-- 상단바와 시간 막대를 한 덩어리로 붙인다. 따로 sticky 를 걸면 겹치는 높이를 손으로 맞춰야 한다. -->
+  <div class="hud">
+    <header class="topbar">
+      <h1>🍰 케익 가게</h1>
+      <div class="stats">
+        <span>💰 <b id="money">0</b>원</span>
+        <span>주문 <b id="orderNo">1</b>번째</span>
+        <span id="timer">⏱ <b id="timeLeft">0</b>초</span>
+      </div>
+      <button id="resetBtn" type="button">처음부터</button>
+    </header>
+    <div class="clock" id="clock"><div class="clockFill" id="clockFill"></div></div>
+  </div>
 
   <main class="board">
     <section class="panel" id="orderPanel">
@@ -57,8 +59,19 @@
     </form>
   </dialog>
 
+  <dialog id="resetDialog">
+    <form method="dialog">
+      <h3>처음부터 시작할까요?</h3>
+      <p class="warn">지금까지 모은 돈과 해금한 재료가 모두 사라져요. 되돌릴 수 없어요.</p>
+      <menu>
+        <button value="reset" type="submit" class="danger">초기화</button>
+        <button value="cancel" type="submit" autofocus>취소</button>
+      </menu>
+    </form>
+  </dialog>
+
   <dialog id="resultDialog"></dialog>
 
-  <script type="module" src="src/game.js"></script>
+  <script type="module" src="src/game.js?v=2"></script>
 </body>
 </html>

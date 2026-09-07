@@ -5,18 +5,20 @@ body { margin: 0; font-family: system-ui, sans-serif; background: #faf6f0; color
 /* 터치에서 더블탭 확대 대기(약 300ms)를 없앤다. 재료를 연속으로 두드릴 때 체감이 크다. */
 button { touch-action: manipulation; }
 
-/* 세로 화면에서는 패널을 위아래로 쌓느라 시계가 스크롤 밖으로 나간다. 위에 붙여 둔다. */
-.topbar { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 20px; background: #fff; border-bottom: 1px solid #e6ded3; }
+/* 세로 화면에서는 패널을 위아래로 쌓느라 시계가 스크롤 밖으로 나간다. 위에 붙여 둔다.
+   상단바와 막대를 함께 감싸므로 상단바가 줄바꿈으로 높아져도 어긋나지 않는다. */
+.hud { position: sticky; top: 0; z-index: 2; }
+.topbar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+  gap: 8px 12px; padding: 12px 20px; background: #fff; border-bottom: 1px solid #e6ded3; }
 .topbar h1 { font-size: 20px; margin: 0; }
 .stats { display: flex; gap: 20px; font-size: 15px; }
 #timer { font-variant-numeric: tabular-nums; }
 #timer.hurry { color: #c22; font-weight: 700; }
-#resetBtn { min-width: 40px; min-height: 40px; margin: -10px 0; padding: 0; font-size: 18px;
-  border: 0; background: none; cursor: pointer; color: #a2968a; }
+#resetBtn { min-height: 40px; padding: 0 12px; font-size: 13px; border: 1px solid #e6ded3;
+  border-radius: 8px; background: #fffdfa; cursor: pointer; color: #7a6a58; }
 
 /* 남은 시간 막대. 폭이 줄어드는 것만으로 압박을 준다. */
-.clock { position: sticky; top: 45px; z-index: 2; height: 10px; background: #ece4d9; overflow: hidden; }
+.clock { height: 10px; background: #ece4d9; overflow: hidden; }
 /* 폭은 매 프레임 직접 그린다. transition 을 걸면 막대가 늘 한 박자 늦는다. */
 .clockFill { height: 100%; width: 100%; background: #6fae5a;
   transition: background-color .4s linear; }
@@ -28,6 +30,9 @@ button { touch-action: manipulation; }
   align-items: start; max-width: 1100px; margin: 0 auto; }
 @media (max-width: 700px) {
   .board { grid-template-columns: 1fr; }
+  /* 좁은 화면에서는 제목을 한 줄로 두고 숫자와 버튼을 아래 줄에 나눠 놓는다. */
+  .topbar h1 { flex: 1 1 100%; font-size: 17px; }
+  .stats { gap: 12px; font-size: 14px; }
 }
 .panel { background: #fff; border: 1px solid #e6ded3; border-radius: 10px; padding: 16px; }
 .panel h2 { margin: 0 0 12px; font-size: 16px; }
@@ -70,6 +75,9 @@ dialog button { padding: 8px 16px; cursor: pointer; border-radius: 6px; border: 
   text-align: center; font-size: 22px; margin: 8px 0 0; }
 .amountValue button { width: 56px; height: 56px; font-size: 26px; line-height: 1; }
 #amountRange { height: 44px; } /* 슬라이더 손잡이를 손가락으로 잡을 수 있는 높이 */
+
+#resetDialog .warn { color: #7a6a58; font-size: 14px; margin: 8px 0 0; max-width: 22em; }
+#resetDialog .danger { border-color: #d0433f; background: #d0433f; color: #fff; }
 
 .stars { font-size: 34px; text-align: center; margin: 0 0 12px; }
 .axes { display: grid; gap: 6px; margin: 0 0 14px; font-size: 14px; }

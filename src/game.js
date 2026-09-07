@@ -290,10 +290,16 @@ el('finishBtn').addEventListener('click', () => {
 });
 
 // 초기화는 저장분을 지우고 새로고침한다. 상태를 손으로 되돌리면 빠뜨리는 곳이 생긴다.
+// 되돌릴 수 없는 조작이라 브라우저 confirm 이 아니라 전용 다이얼로그로 한 번 막는다.
 el('resetBtn').addEventListener('click', () => {
-  if (!confirm('돈과 해금한 재료를 모두 지우고 처음부터 시작할까요?')) return;
-  localStorage.removeItem(SAVE_KEY);
-  location.reload();
+  const dialog = el('resetDialog');
+  dialog.returnValue = '';
+  dialog.onclose = () => {
+    if (dialog.returnValue !== 'reset') return;
+    localStorage.removeItem(SAVE_KEY);
+    location.reload();
+  };
+  dialog.showModal();
 });
 
 load();
